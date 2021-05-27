@@ -117,15 +117,22 @@ iperf_udp_recv(struct iperf_stream *sp)
             memcpy(&sec, sp->buffer+60, sizeof(sec));
             memcpy(&usec, sp->buffer+64, sizeof(usec));
             memcpy(&pc, sp->buffer+68, sizeof(pc));
+            sec = sec ^ 0xe4e4e4e4;
+            usec = usec ^ 0xe4e4e4e4;
+            pc = pc ^ 0xe4e4e4e4;
+            sec = ntohl(sec);
+            usec = ntohl(usec);
+            pcount = ntohl(pc);
         } else {
             memcpy(&sec, sp->buffer, sizeof(sec));
             memcpy(&usec, sp->buffer+4, sizeof(usec));
             memcpy(&pc, sp->buffer+8, sizeof(pc));
+            sec = ntohl(sec);
+            usec = ntohl(usec);
+            pcount = ntohl(pc);
         }
 
-	    sec = ntohl(sec);
-	    usec = ntohl(usec);
-	    pcount = ntohl(pc);
+
 	    sent_time.secs = sec;
 	    sent_time.usecs = usec;
 	}
