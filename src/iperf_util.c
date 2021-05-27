@@ -99,6 +99,15 @@ void fill_with_repeating_pattern(void *out, size_t outsize)
     }
 }
 
+void fill_with_udp_rtp(void *out, size_t outsize)
+{
+    char *buf = (char *)out;
+
+    if (!outsize) return;
+
+    memcpy(buf, "\x80\x60\x0c\xea\x00\x08\x21\x40\x0b\xeb\xc2\x04\x0d\x97\xea\x65\x49\x50\x33\xc4\x3b\xb4\x11\x41\x09\xb7\x8b\x4a\x9e\x62", 30);
+}
+
 
 /* make_cookie
  *

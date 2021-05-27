@@ -87,7 +87,7 @@ typedef uint64_t iperf_size_t;
 #define OPT_IDLE_TIMEOUT 25
 #define OPT_DONT_FRAGMENT 26
 #define OPT_RCV_TIMEOUT 27
-
+#define OPT_UDP_RTP 28
 /* states */
 #define TEST_START 1
 #define TEST_RUNNING 2
@@ -139,6 +139,7 @@ int	iperf_get_test_zerocopy( struct iperf_test* ipt );
 int	iperf_get_test_get_server_output( struct iperf_test* ipt );
 char*	iperf_get_test_bind_address ( struct iperf_test* ipt );
 int	iperf_get_test_udp_counters_64bit( struct iperf_test* ipt );
+int	iperf_get_test_udp_rtp( struct iperf_test* ipt );
 int	iperf_get_test_one_off( struct iperf_test* ipt );
 int iperf_get_test_tos( struct iperf_test* ipt );
 char*	iperf_get_extra_data( struct iperf_test* ipt );
@@ -178,7 +179,7 @@ int	iperf_has_zerocopy( void );
 void	iperf_set_test_zerocopy( struct iperf_test* ipt, int zerocopy );
 void	iperf_set_test_get_server_output( struct iperf_test* ipt, int get_server_output );
 void	iperf_set_test_bind_address( struct iperf_test* ipt, const char *bind_address );
-void	iperf_set_test_udp_counters_64bit( struct iperf_test* ipt, int udp_counters_64bit );
+void	iperf_set_test_udp_rtp( struct iperf_test* ipt, int udp_rtp );
 void	iperf_set_test_one_off( struct iperf_test* ipt, int one_off );
 void    iperf_set_test_tos( struct iperf_test* ipt, int tos );
 void	iperf_set_test_extra_data( struct iperf_test* ipt, const char *dat );

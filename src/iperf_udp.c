@@ -113,9 +113,16 @@ iperf_udp_recv(struct iperf_stream *sp)
 	}
 	else {
 	    uint32_t pc;
-	    memcpy(&sec, sp->buffer, sizeof(sec));
-	    memcpy(&usec, sp->buffer+4, sizeof(usec));
-	    memcpy(&pc, sp->buffer+8, sizeof(pc));
+        if (sp->test->udp_rtp) {
+            memcpy(&sec, sp->buffer+30, sizeof(sec));
+            memcpy(&usec, sp->buffer+34, sizeof(usec));
+            memcpy(&pc, sp->buffer+38, sizeof(pc));
+        } else {
+            memcpy(&sec, sp->buffer, sizeof(sec));
+            memcpy(&usec, sp->buffer+4, sizeof(usec));
+            memcpy(&pc, sp->buffer+8, sizeof(pc));
+        }
+
 	    sec = ntohl(sec);
 	    usec = ntohl(usec);
 	    pcount = ntohl(pc);
@@ -241,10 +248,15 @@ iperf_udp_send(struct iperf_stream *sp)
 	sec = htonl(before.secs);
 	usec = htonl(before.usecs);
 	pcount = htonl(sp->packet_count);
-	
-	memcpy(sp->buffer, &sec, sizeof(sec));
-	memcpy(sp->buffer+4, &usec, sizeof(usec));
-	memcpy(sp->buffer+8, &pcount, sizeof(pcount));
+        if (sp->test->udp_rtp) {
+            memcpy(sp->buffer+30, &sec, sizeof(sec));
+            memcpy(sp->buffer + 34, &usec, sizeof(usec));
+            memcpy(sp->buffer + 38, &pcount, sizeof(pcount));
+        } else {
+            memcpy(sp->buffer, &sec, sizeof(sec));
+            memcpy(sp->buffer + 4, &usec, sizeof(usec));
+            memcpy(sp->buffer + 8, &pcount, sizeof(pcount));
+        }
 	
     }
 

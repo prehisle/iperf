@@ -35,6 +35,7 @@
 int readentropy(void *out, size_t outsize);
 
 void fill_with_repeating_pattern(void *out, size_t outsize);
+void fill_with_udp_rtp(void *out, size_t outsize);
 
 void make_cookie(char *);
 

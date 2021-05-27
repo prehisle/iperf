@@ -351,6 +351,12 @@ iperf_get_test_udp_counters_64bit(struct iperf_test *ipt)
 }
 
 int
+iperf_get_test_udp_rtp(struct iperf_test *ipt)
+{
+    return ipt->udp_rtp;
+}
+
+int
 iperf_get_test_one_off(struct iperf_test *ipt)
 {
     return ipt->one_off;
@@ -703,6 +709,12 @@ iperf_set_test_udp_counters_64bit(struct iperf_test *ipt, int udp_counters_64bit
 }
 
 void
+iperf_set_test_udp_rtp(struct iperf_test *ipt, int udp_rtp)
+{
+    ipt->udp_rtp = udp_rtp;
+}
+
+void
 iperf_set_test_one_off(struct iperf_test *ipt, int one_off)
 {
     ipt->one_off = one_off;
@@ -991,6 +1003,7 @@ iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
 	{"forceflush", no_argument, NULL, OPT_FORCEFLUSH},
 	{"get-server-output", no_argument, NULL, OPT_GET_SERVER_OUTPUT},
 	{"udp-counters-64bit", no_argument, NULL, OPT_UDP_COUNTERS_64BIT},
+	{"udp-rtp", no_argument, NULL, OPT_UDP_RTP},
  	{"no-fq-socket-pacing", no_argument, NULL, OPT_NO_FQ_SOCKET_PACING},
 #if defined(HAVE_DONT_FRAGMENT)
 	{"dont-fragment", no_argument, NULL, OPT_DONT_FRAGMENT},
@@ -1400,6 +1413,9 @@ iperf_parse_arguments(struct iperf_test *test, int argc, char **argv)
 		break;
 	    case OPT_UDP_COUNTERS_64BIT:
 		test->udp_counters_64bit = 1;
+		break;
+	    case OPT_UDP_RTP:
+		test->udp_rtp = 1;
 		break;
 	    case OPT_NO_FQ_SOCKET_PACING:
 #if defined(HAVE_SO_MAX_PACING_RATE)
@@ -2028,6 +2044,8 @@ send_parameters(struct iperf_test *test)
 	    cJSON_AddNumberToObject(j, "get_server_output", iperf_get_test_get_server_output(test));
 	if (test->udp_counters_64bit)
 	    cJSON_AddNumberToObject(j, "udp_counters_64bit", iperf_get_test_udp_counters_64bit(test));
+	if (test->udp_rtp)
+	    cJSON_AddNumberToObject(j, "udp_rtp", iperf_get_test_udp_rtp(test));
 	if (test->repeating_payload)
 	    cJSON_AddNumberToObject(j, "repeating_payload", test->repeating_payload);
 #if defined(HAVE_DONT_FRAGMENT)
@@ -2140,6 +2158,8 @@ get_parameters(struct iperf_test *test)
 	    iperf_set_test_get_server_output(test, 1);
 	if ((j_p = cJSON_GetObjectItem(j, "udp_counters_64bit")) != NULL)
 	    iperf_set_test_udp_counters_64bit(test, 1);
+	if ((j_p = cJSON_GetObjectItem(j, "udp_rtp")) != NULL)
+	    iperf_set_test_udp_rtp(test, 1);
 	if ((j_p = cJSON_GetObjectItem(j, "repeating_payload")) != NULL)
 	    test->repeating_payload = 1;
 #if defined(HAVE_DONT_FRAGMENT)
@@ -2968,6 +2988,7 @@ iperf_reset_test(struct iperf_test *test)
     memset(test->cookie, 0, COOKIE_SIZE);
     test->multisend = 10;	/* arbitrary */
     test->udp_counters_64bit = 0;
+    test->udp_rtp = 0;
     if (test->title) {
 	free(test->title);
 	test->title = NULL;
@@ -4075,7 +4096,9 @@ iperf_new_stream(struct iperf_test *test, int s, int sender)
         sp->diskfile_fd = -1;
 
     /* Initialize stream */
-    if (test->repeating_payload)
+    if (test->udp_rtp)
+        fill_with_udp_rtp(sp->buffer, test->settings->blksize);
+    else if (test->repeating_payload)
         fill_with_repeating_pattern(sp->buffer, test->settings->blksize);
     else
         ret = readentropy(sp->buffer, test->settings->blksize);
